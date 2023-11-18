@@ -5,3 +5,8 @@ założenia projektu (na dzień 12/11/23):
 - cały system wywoływany jednym poleceniem docker compose
 - zewnętrzny serwis autoryzacyjny
 - (opcjonalne) wykorzystanie protocol buffers do komunikacji wewnętrznej
+## Docker
+Baza danych włączana jest za pomocą kontenera na porcie 3306. Komenda do zbudowania obrazu: \
+```docker build -t tictactoe:database ./src/database/``` \
+Komenda do uruchamiania aplikacji w kontenarze \
+```docker run -p 3306:3306 -d tictactoe:database```
