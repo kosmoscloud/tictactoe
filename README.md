@@ -5,3 +5,4 @@ założenia projektu (na dzień 12/11/23):
 - cały system wywoływany jednym poleceniem docker compose
 - zewnętrzny serwis autoryzacyjny
 - (opcjonalne) wykorzystanie protocol buffers do komunikacji wewnętrznej
+asdfhg
