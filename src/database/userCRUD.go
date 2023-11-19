@@ -35,3 +35,17 @@ func CreateUser(username string) (*dto.User, error) {
 
 	return user, nil
 }
+
+func UpdateUser(id int64, username string) (*dto.User, error) {
+	_, err := DB.Exec("UPDATE users SET username=? WHERE id=?", username, id)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := GetUser(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}

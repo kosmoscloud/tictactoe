@@ -62,3 +62,30 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 
 }
+
+func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
+	jsonBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	body := &dto.UpdateUserRequest{}
+	json.Unmarshal(jsonBody, body)
+
+	if body.Username == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	user, err := db.UpdateUser(body.UserId, body.Username)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
+
+}
