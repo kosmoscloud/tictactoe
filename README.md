@@ -10,3 +10,5 @@ Baza danych włączana jest za pomocą kontenera na porcie 3306. Komenda do zbud
 ```docker build -t tictactoe:database ./src/database/``` \
 Komenda do uruchamiania aplikacji w kontenarze \
 ```docker run -p 3306:3306 -d tictactoe:database```
+## Postman 
+Aktualna kolekcja znajduje się pod [tym linkiem](https://solar-capsule-457081.postman.co/workspace/3d5353de-a10b-461d-95d5-9f19dc4ff8f9).
