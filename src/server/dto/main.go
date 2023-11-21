@@ -17,7 +17,7 @@ type Room struct {
 }
 
 type User struct {
-	UserId      string            `json:"id"`
-	Username    string            `json:"username"`
-	CreatedDate datetime.DateTime `json:"createdDate"`
+	UserId      string            `json:"id" sql:"id" key:"primary"`
+	Username    string            `json:"username" sql:"username"`
+	CreatedDate datetime.DateTime `json:"createdDate" sql:"createdDate"`
 }
