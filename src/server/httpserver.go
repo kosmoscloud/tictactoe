@@ -12,7 +12,7 @@ func InitServer() {
 	userRouter.HandleFunc("", HandleGetUser).Methods("GET")
 	userRouter.HandleFunc("", HandleCreateUser).Methods("POST")
 	userRouter.HandleFunc("", HandleUpdateUser).Methods("PUT")
-	//userRouter.HandleFunc("", HandleDeleteUser).Methods("DELETE")
+	userRouter.HandleFunc("", HandleDeleteUser).Methods("DELETE")
 
 	http.Handle("/api/user", userRouter)
 }

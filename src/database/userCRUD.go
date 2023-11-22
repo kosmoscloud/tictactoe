@@ -49,3 +49,11 @@ func UpdateUser(id int64, username string) (*dto.User, error) {
 
 	return user, nil
 }
+
+func DeleteUser(id int64) (*dto.User, error) {
+	_, err := DB.Exec("DELETE FROM users WHERE id=?", id)
+	if err != nil {
+		return err
+	}
+	return user, nil
+}

@@ -7,3 +7,7 @@ type CreateUserResponse struct {
 type GetUserResponse struct {
 	User User `json:"user"`
 }
+
+type UpdateUserResponse struct {
+	User User `json:"user"`
+}
