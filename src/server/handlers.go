@@ -89,3 +89,25 @@ func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 
 }
+
+func HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
+	queryId := r.URL.Query().Get("id")
+	log.Default().Println("Handling delete user with id: " + queryId)
+
+	id, err := strconv.ParseInt(queryId, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	_, err = db.DeleteUser(id)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+
+}
