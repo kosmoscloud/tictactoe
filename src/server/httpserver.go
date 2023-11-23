@@ -3,10 +3,21 @@ package server
 import (
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func InitServer() {
-	http.HandleFunc("/api/user", HandleUser)
+	CuserRouter := mux.NewRouter().PathPrefix("/api/user").Subrouter()
+	CuserRouter.HandleFunc("", HandleCreateUser).Methods("POST")
+
+	RUDuserRouter := mux.NewRouter().PathPrefix("/api/user").Subrouter()
+	RUDuserRouter.HandleFunc("/{id}", HandleGetUser).Methods("GET")
+	RUDuserRouter.HandleFunc("/{id}", HandleUpdateUser).Methods("PUT")
+	RUDuserRouter.HandleFunc("/{id}", HandleDeleteUser).Methods("DELETE")
+
+	http.Handle("/api/user", CuserRouter)
+	http.Handle("/api/user/", RUDuserRouter)
 }
 
 func Serve() {
