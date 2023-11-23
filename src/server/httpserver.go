@@ -8,13 +8,16 @@ import (
 )
 
 func InitServer() {
-	userRouter := mux.NewRouter().PathPrefix("/api/user").Subrouter()
-	userRouter.HandleFunc("", HandleGetUser).Methods("GET")
-	userRouter.HandleFunc("", HandleCreateUser).Methods("POST")
-	userRouter.HandleFunc("", HandleUpdateUser).Methods("PUT")
-	userRouter.HandleFunc("", HandleDeleteUser).Methods("DELETE")
+	CuserRouter := mux.NewRouter().PathPrefix("/api/user").Subrouter()
+	CuserRouter.HandleFunc("", HandleCreateUser).Methods("POST")
 
-	http.Handle("/api/user", userRouter)
+	RUDuserRouter := mux.NewRouter().PathPrefix("/api/user").Subrouter()
+	RUDuserRouter.HandleFunc("/{id}", HandleGetUser).Methods("GET")
+	RUDuserRouter.HandleFunc("/{id}", HandleUpdateUser).Methods("PUT")
+	RUDuserRouter.HandleFunc("/{id}", HandleDeleteUser).Methods("DELETE")
+
+	http.Handle("/api/user", CuserRouter)
+	http.Handle("/api/user/", RUDuserRouter)
 }
 
 func Serve() {

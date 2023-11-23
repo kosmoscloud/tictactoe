@@ -8,6 +8,8 @@ import (
 	"strconv"
 	db "tictactoe-service/database"
 	"tictactoe-service/server/dto"
+
+	"github.com/gorilla/mux"
 )
 
 func HandleUser(w http.ResponseWriter, r *http.Request) {
@@ -15,10 +17,11 @@ func HandleUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleGetUser(w http.ResponseWriter, r *http.Request) {
-	queryId := r.URL.Query().Get("id")
-	log.Default().Println("Handling get user with id: " + queryId)
+	pathParams := mux.Vars(r)
+	sid := pathParams["id"]
+	log.Default().Println("Handling update user with id: " + sid)
 
-	id, err := strconv.ParseInt(queryId, 10, 64)
+	id, err := strconv.ParseInt(sid, 10, 64)
 	if err != nil {
 		log.Default().Println(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -64,13 +67,19 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	sid := pathParams["id"]
+	log.Default().Println("Handling update user with id: " + sid)
+
+	id, err := strconv.ParseInt(sid, 10, 64)
 	jsonBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Default().Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	body := &dto.UpdateUserRequest{}
+
+	body := &dto.UpdateUserRequest{UserId: id}
 	json.Unmarshal(jsonBody, body)
 
 	if body.Username == "" {
@@ -86,22 +95,27 @@ func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
-
+	err = json.NewEncoder(w).Encode(user)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
 
 func HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
-	queryId := r.URL.Query().Get("id")
-	log.Default().Println("Handling delete user with id: " + queryId)
+	pathParams := mux.Vars(r)
+	id := pathParams["id"]
+	log.Default().Println("Handling delete user with id: " + id)
 
-	id, err := strconv.ParseInt(queryId, 10, 64)
+	userId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		log.Default().Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	_, err = db.DeleteUser(id)
+	user, err := db.DeleteUser(userId)
 	if err != nil {
 		log.Default().Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -109,5 +123,10 @@ func HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-
+	err = json.NewEncoder(w).Encode(user)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }
