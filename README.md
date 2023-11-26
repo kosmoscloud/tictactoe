@@ -12,3 +12,5 @@ Komenda do uruchamiania aplikacji w kontenarze \
 ```docker run -p 3306:3306 -d tictactoe:database```
 ## Postman 
 Aktualna kolekcja znajduje się pod [tym linkiem](https://solar-capsule-457081.postman.co/workspace/3d5353de-a10b-461d-95d5-9f19dc4ff8f9).
+## Testy
+Do włączenia testów bazy danych znajdujących się w [tym folderze](/src/database/) należy zbudować i uruchomić najpierw kontener z bazą mySQL o parametrach zawartych w pliku konfiguracyjnym testów [test.properties](/src/properties/test.properties).

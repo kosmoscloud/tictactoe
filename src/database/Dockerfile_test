@@ -1,8 +1,8 @@
 FROM mysql:latest
 
 ENV MYSQL_ROOT_PASSWORD=password
-ENV MYSQL_USER=tictactoe_app
+ENV MYSQL_USER=tictactoe_test_app
 ENV MYSQL_PASSWORD=password
-ENV MYSQL_DATABASE=tictactoe_database
+ENV MYSQL_DATABASE=tictactoe_database_test
 
 EXPOSE 3306
