@@ -27,13 +27,13 @@ func main() {
 }
 
 func initFlags(done chan bool) {
-	testFlag := flag.Bool("t", false, "Enable test mode")
+	emptyFlag := flag.Bool("empty", false, "Enable empty mode")
 
 	flag.Parse()
 
-	if *testFlag {
-		util.SetupEnvironmentVariables("properties/test.properties", done)
+	if *emptyFlag {
+		util.SetupEnvironmentVariablesChan("properties/empty.properties", done)
 	} else {
-		util.SetupEnvironmentVariables("properties/default.properties", done)
+		util.SetupEnvironmentVariablesChan("properties/default.properties", done)
 	}
 }
