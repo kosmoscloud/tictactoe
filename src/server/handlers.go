@@ -130,3 +130,42 @@ func HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func HandleCreateRoom(w http.ResponseWriter, r *http.Request) {
+	jsonBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	body := &dto.CreateRoomRequest{}
+	json.Unmarshal(jsonBody, body)
+	if body.User1 == "" || body.User2 == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	usrid1, err := strconv.ParseInt(body.User1, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	usrid2, err := strconv.ParseInt(body.User2, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	room, err := db.CreateRoom(usrid1, usrid2)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(room)
+}

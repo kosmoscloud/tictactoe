@@ -16,3 +16,12 @@ func setupUserTable(DB *sql.DB) {
 		log.Default().Print("Users table setup successfully!")
 	}
 }
+
+func setupRoomTable(DB *sql.DB) {
+	_, err := DB.Exec("CREATE TABLE IF NOT EXISTS rooms (id INT AUTO_INCREMENT PRIMARY KEY, created TIMESTAMP, user1 INT, user2 INT, winner INT DEFAULT 0, moves VARCHAR(255) DEFAULT '0')")
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		log.Default().Print("Rooms table setup successfully!")
+	}
+}

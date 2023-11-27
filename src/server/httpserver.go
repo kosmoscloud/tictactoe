@@ -18,6 +18,12 @@ func InitServer() {
 
 	http.Handle("/api/user", CuserRouter)
 	http.Handle("/api/user/", RUDuserRouter)
+
+	CroomRouter := mux.NewRouter().PathPrefix("/api/room").Subrouter()
+	CroomRouter.HandleFunc("", HandleCreateRoom).Methods("POST")
+
+	http.Handle("/api/room", CroomRouter)
+
 }
 
 func Serve() {

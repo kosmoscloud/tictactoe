@@ -19,6 +19,7 @@ func InitDB() {
 	}
 
 	setupUserTable(DB)
+	setupRoomTable(DB)
 }
 
 func CloseDB() {
