@@ -25,6 +25,17 @@ func TestGetUser(t *testing.T) {
 			t.Errorf("getUser failed: %v", err)
 		}
 	})
+
+	t.Run("getUser failed", func(t *testing.T) {
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM users WHERE id=?")).WillReturnError(fmt.Errorf("some error"))
+		user, err := GetUser(1)
+		if err == nil {
+			t.Error("getUser failed: expected error")
+		}
+		if user != nil {
+			t.Errorf("getUser failed: expected nil user, got %v", user)
+		}
+	})
 }
 
 func TestCreateUser(t *testing.T) {
