@@ -22,7 +22,13 @@ func InitServer() {
 	CroomRouter := mux.NewRouter().PathPrefix("/api/room").Subrouter()
 	CroomRouter.HandleFunc("", HandleCreateRoom).Methods("POST")
 
+	RUDroomRouter := mux.NewRouter().PathPrefix("/api/room").Subrouter()
+	//RUDroomRouter.HandleFunc("/{id}", HandleGetRoom).Methods("GET")
+	//RUDroomRouter.HandleFunc("/{id}", HandleUpdateRoom).Methods("PUT")
+	RUDroomRouter.HandleFunc("/{id}", HandleDeleteRoom).Methods("DELETE")
+
 	http.Handle("/api/room", CroomRouter)
+	http.Handle("/api/room/", RUDroomRouter)
 
 }
 

@@ -169,3 +169,31 @@ func HandleCreateRoom(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(room)
 }
+
+func HandleDeleteRoom(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	id := pathParams["id"]
+	log.Default().Println("Handling delete room with id: " + id)
+
+	roomId, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	room, err := db.DeleteRoom(roomId)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(room)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}

@@ -66,8 +66,8 @@ func DeleteUser(id int64) (*dto.User, error) {
 
 func GetRoom(id int64) (*dto.Room, error) {
 	room := &dto.Room{}
-	row := DB.QueryRow("SELECT * FROM rooms WHERE id=?", id)
-	err := row.Scan(&room.RoomId, &room.CreatedDate, &room.User1, &room.User2, &room.Winner, &room.Moves)
+	row := DB.QueryRow("SELECT id, created, user1, user2 FROM rooms WHERE id=?", id)
+	err := row.Scan(&room.RoomId, &room.CreatedDate, &room.User1, &room.User2)
 	if err != nil {
 		return nil, err
 	}
@@ -86,6 +86,20 @@ func CreateRoom(user1 int64, user2 int64) (*dto.Room, error) {
 	}
 
 	room, err := GetRoom(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return room, nil
+}
+
+func DeleteRoom(id int64) (*dto.Room, error) {
+	room, err := GetRoom(id)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = DB.Exec("DELETE FROM rooms WHERE id=?", id)
 	if err != nil {
 		return nil, err
 	}
