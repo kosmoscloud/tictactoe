@@ -26,12 +26,6 @@ func SetupEnvironmentVariables(path string) error {
 	return nil
 }
 
-// todo: figure out how to name this function
-func SetupEnvironmentVariablesChan(path string, done chan bool) {
-	SetupEnvironmentVariables(path)
-	done <- true
-}
-
 func SetupTestEnvironment() error {
 	p := properties.MustLoadFile("../properties/test.properties", properties.UTF8)
 	for k, v := range p.Map() {

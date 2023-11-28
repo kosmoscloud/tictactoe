@@ -19,11 +19,11 @@ func GetUser(id int64) (*dto.User, error) {
 
 func CreateUser(username string) (*dto.User, error) {
 	createdDate := time.Now()
-	rows, err := DB.Exec("INSERT INTO users (username, created) VALUES (?, ?)", username, createdDate)
+	result, err := DB.Exec("INSERT INTO users (username, created) VALUES (?, ?)", username, createdDate)
 	if err != nil {
 		return nil, err
 	}
-	id, err := rows.LastInsertId()
+	id, err := result.LastInsertId()
 	if err != nil {
 		return nil, err
 	}
