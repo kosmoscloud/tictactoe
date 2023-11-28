@@ -1,23 +1,11 @@
 package database
 
 import (
-	"log"
-	"os"
 	"testing"
 	"tictactoe-service/util"
 
 	_ "github.com/go-sql-driver/mysql"
 )
-
-func TestMain(m *testing.M) {
-	err := util.SetupTestEnvironment()
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Println("Test environment setup successful")
-	}
-	os.Exit(m.Run())
-}
 
 func TestInitDB(t *testing.T) {
 	t.Run("initDB success", func(t *testing.T) {

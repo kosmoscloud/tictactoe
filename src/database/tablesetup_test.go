@@ -11,14 +11,7 @@ import (
 
 func TestSetupUserTable(t *testing.T) {
 
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-	DB = db
 	dberr := errors.New("MySQL error: connection refused")
-
-	defer db.Close()
 
 	t.Run("setupUserTable success", func(t *testing.T) {
 		mock.ExpectExec(regexp.QuoteMeta("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), created TIMESTAMP)")).WillReturnResult(sqlmock.NewResult(1, 1))
