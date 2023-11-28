@@ -14,32 +14,30 @@ var (
 	err error
 )
 
-func InitDB() error {
-	DB, err = sql.Open("mysql", generateSqlOpenString())
-	if err != nil {
-		log.Println(err)
-		return err
-	}
+var fatalExit = log.Fatal
+var sqlOpenString = generateSqlOpenString
 
-	err = DB.Ping()
-	if err != nil {
-		log.Println(err)
-		return err
-	} else {
-		log.Println("Successfully connected to tictactoe-database!")
-	}
-
-	setupUserTable(DB)
-	return nil
+// InitDB initializes the database connection and uses the fatalExit function if an error occurs
+func InitDB() {
+	openSqlConnection()
+	pingDatabase()
+	setupUserTable()
 }
 
-func CloseDB() error {
-	err = DB.Close()
+func openSqlConnection() {
+	DB, err = sql.Open("mysql", sqlOpenString())
 	if err != nil {
-		log.Println(err)
-		return err
+		fatalExit(err)
 	}
-	return nil
+}
+
+func pingDatabase() {
+	err = DB.Ping()
+	if err != nil {
+		fatalExit(err)
+	} else {
+		log.Println("Successfully pinged tictactoe-database!")
+	}
 }
 
 func generateSqlOpenString() string {

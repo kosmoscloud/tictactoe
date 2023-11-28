@@ -15,15 +15,8 @@ func main() {
 	<-doneParsingFlags
 
 	server.InitServer()
-	err = database.InitDB()
-	if err != nil {
-		panic(err)
-	}
+	database.InitDB()
 	server.Serve()
-	err = database.CloseDB()
-	if err != nil {
-		panic(err)
-	}
 }
 
 func initFlags(done chan bool) {
