@@ -8,6 +8,7 @@ import (
 )
 
 func TestInitDB(t *testing.T) {
+	DB = nil
 	t.Run("initDB success", func(t *testing.T) {
 		caught := catchFatalExit(func() {
 			InitDB()
@@ -27,9 +28,11 @@ func TestInitDB(t *testing.T) {
 		}
 		util.SetupTestEnvironment()
 	})
+	DB = mockDB
 }
 
 func TestOpenSqlConnection(t *testing.T) {
+	DB = nil
 	t.Run("openSqlConnection success", func(t *testing.T) {
 		caught := catchFatalExit(func() {
 			openSqlConnection()
@@ -49,11 +52,16 @@ func TestOpenSqlConnection(t *testing.T) {
 		}
 		sqlOpenString = generateSqlOpenString
 	})
+	DB = mockDB
 }
 
 func TestPingDatabase(t *testing.T) {
-	openSqlConnection()
+	DB = nil
 	t.Run("pingDatabase success", func(t *testing.T) {
+		if err != nil {
+			t.Errorf("pingDatabase() failed to close DB connection")
+		}
+		openSqlConnection()
 		caught := catchFatalExit(func() {
 			pingDatabase()
 		})
@@ -64,7 +72,6 @@ func TestPingDatabase(t *testing.T) {
 
 	t.Run("pingDatabase failure", func(t *testing.T) {
 		util.SetupEnvironmentVariables("../properties/empty.properties")
-		DB.Close()
 		openSqlConnection()
 		caught := catchFatalExit(func() {
 			pingDatabase()
@@ -73,7 +80,9 @@ func TestPingDatabase(t *testing.T) {
 			t.Errorf("pingDatabase() did not return an error")
 		}
 		util.SetupTestEnvironment()
+		DB.Close()
 	})
+	DB = mockDB
 }
 
 func TestGenerateSqlOpenString(t *testing.T) {
@@ -104,7 +113,6 @@ func TestGenerateSqlOpenString(t *testing.T) {
 		}
 		util.SetupTestEnvironment()
 	})
-
 }
 
 func catchFatalExit(f func()) (caught bool) {
