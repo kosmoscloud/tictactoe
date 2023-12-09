@@ -7,8 +7,8 @@ import (
 
 func GetRoom(id int64) (*dto.Room, error) {
 	room := &dto.Room{}
-	row := DB.QueryRow("SELECT id, created, user1, user2 FROM rooms WHERE id=?", id)
-	err := row.Scan(&room.RoomId, &room.CreatedDate, &room.User1, &room.User2)
+	row := DB.QueryRow("SELECT id, created, user1, user2, winner FROM rooms WHERE id=?", id)
+	err := row.Scan(&room.RoomId, &room.CreatedDate, &room.User1, &room.User2, &room.Winner)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +34,18 @@ func CreateRoom(user1 int64, user2 int64) (*dto.Room, error) {
 	return room, nil
 }
 
-func UpdateRoom(move *dto.Move) (*dto.Room, error) {
-	return nil, nil
+func UpdateRoom(RoomId int64, winner int64) (*dto.Room, error) {
+	_, err := DB.Exec("UPDATE rooms SET winner=? WHERE id=?", winner, RoomId)
+	if err != nil {
+		return nil, err
+	}
+	room, err := GetRoom(RoomId)
+	if err != nil {
+		return nil, err
+	}
+
+	return room, nil
+
 }
 
 func DeleteRoom(id int64) (*dto.Room, error) {
@@ -48,6 +58,7 @@ func DeleteRoom(id int64) (*dto.Room, error) {
 	if err != nil {
 		return nil, err
 	}
+	//_, err = DB.Exec("DELETE FROM moves WHERE room_id=?", id)
 
 	return room, nil
 }

@@ -25,3 +25,12 @@ func setupRoomTable(DB *sql.DB) {
 		log.Default().Print("Rooms table setup successfully!")
 	}
 }
+
+func SetupMooveTable(DB *sql.DB) {
+	_, err := DB.Exec("CREATE TABLE IF NOT EXISTS moves (id INT AUTO_INCREMENT PRIMARY KEY, room_id INT, user_id INT, row_ INT, col INT)")
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		log.Default().Print("Moves table setup successfully!")
+	}
+}

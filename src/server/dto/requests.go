@@ -17,3 +17,11 @@ type CreateRoomRequest struct {
 	User1 string `json:"user1"`
 	User2 string `json:"user2"`
 }
+
+type UpdateRoomRequest struct {
+	Winner string `json:"winner"`
+}
+
+type DeleteRoomRequest struct {
+	RoomId int64 `json:"id"`
+}

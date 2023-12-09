@@ -20,6 +20,7 @@ func InitDB() {
 
 	setupUserTable(DB)
 	setupRoomTable(DB)
+	SetupMooveTable(DB)
 }
 
 func CloseDB() {
