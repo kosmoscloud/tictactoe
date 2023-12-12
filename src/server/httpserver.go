@@ -24,7 +24,9 @@ func InitServer() {
 
 	RUDroomRouter := mux.NewRouter().PathPrefix("/api/room").Subrouter()
 	RUDroomRouter.HandleFunc("/{id}", HandleGetRoom).Methods("GET")
-	RUDroomRouter.HandleFunc("/{id}", HandleUpdateRoom).Methods("PUT")
+	RUDroomRouter.HandleFunc("/{id}/user", HandleUpdateRoomUser2).Methods("PUT")
+	//RUDroomRouter.HandleFunc("/{id}/move", HandleUpdateRoom).Methods("PUT")
+	RUDroomRouter.HandleFunc("/{id}/winner", HandleUpdateRoomWinner).Methods("PUT")
 	RUDroomRouter.HandleFunc("/{id}", HandleDeleteRoom).Methods("DELETE")
 
 	http.Handle("/api/room", CroomRouter)

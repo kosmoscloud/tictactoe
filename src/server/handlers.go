@@ -140,8 +140,9 @@ func HandleCreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	body := &dto.CreateRoomRequest{}
 	json.Unmarshal(jsonBody, body)
-	if body.User1 == "" || body.User2 == "" {
+	if body.User1 == "" {
 		w.WriteHeader(http.StatusBadRequest)
+		log.Default().Println(err)
 		return
 	}
 
@@ -152,16 +153,10 @@ func HandleCreateRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usrid2, err := strconv.ParseInt(body.User2, 10, 64)
+	room, err := db.CreateRoom(usrid1)
 	if err != nil {
 		log.Default().Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	room, err := db.CreateRoom(usrid1, usrid2)
-	if err != nil {
-		log.Default().Println(err)
+		log.Default().Println("Błąd w tworzeniu pokoju ")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -221,7 +216,7 @@ func HandleGetRoom(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func HandleUpdateRoom(w http.ResponseWriter, r *http.Request) {
+func HandleUpdateRoomUser2(w http.ResponseWriter, r *http.Request) {
 	pathParams := mux.Vars(r)
 	sid := pathParams["id"]
 	log.Default().Println("Handling update room with id: " + sid)
@@ -237,20 +232,14 @@ func HandleUpdateRoom(w http.ResponseWriter, r *http.Request) {
 	body := &dto.UpdateRoomRequest{}
 	json.Unmarshal(jsonBody, body)
 
-	//if body.Winner == 1 {
-	//	w.WriteHeader(http.StatusBadRequest)
-	//	log.Default().Println("błądddddd ")
-	//	return
-	//}
-
-	winnerId, err := strconv.ParseInt(body.Winner, 10, 64)
+	user2Id, err := strconv.ParseInt(body.User2, 10, 64)
 	if err != nil {
 		log.Default().Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	room, err := db.UpdateRoom(id, winnerId)
+	room, err := db.UpdateRoomUser2(id, user2Id)
 	if err != nil {
 		log.Default().Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -264,4 +253,44 @@ func HandleUpdateRoom(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func HandleUpdateRoomWinner(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	sid := pathParams["id"]
+	log.Default().Println("Handling update room with id: " + sid)
+
+	id, err := strconv.ParseInt(sid, 10, 64)
+	jsonBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	body := &dto.UpdateRoomRequest{}
+	json.Unmarshal(jsonBody, body)
+
+	winnerId, err := strconv.ParseInt(body.Winner, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	room, err := db.UpdateRoomWinner(id, winnerId)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(room)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 }

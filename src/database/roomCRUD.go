@@ -15,9 +15,9 @@ func GetRoom(id int64) (*dto.Room, error) {
 	return room, nil
 }
 
-func CreateRoom(user1 int64, user2 int64) (*dto.Room, error) {
+func CreateRoom(user1 int64) (*dto.Room, error) {
 	createdDate := time.Now()
-	rows, err := DB.Exec("INSERT INTO rooms (created, user1, user2) VALUES (?, ?, ?)", createdDate, user1, user2)
+	rows, err := DB.Exec("INSERT INTO rooms (created, user1) VALUES (?, ?)", createdDate, user1)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +34,22 @@ func CreateRoom(user1 int64, user2 int64) (*dto.Room, error) {
 	return room, nil
 }
 
-func UpdateRoom(RoomId int64, winner int64) (*dto.Room, error) {
-	_, err := DB.Exec("UPDATE rooms SET winner=? WHERE id=?", winner, RoomId)
+func UpdateRoomUser2(RoomId int64, User2 int64) (*dto.Room, error) {
+	_, err := DB.Exec("UPDATE rooms SET user2=? WHERE id=?", User2, RoomId)
+	if err != nil {
+		return nil, err
+	}
+	room, err := GetRoom(RoomId)
+	if err != nil {
+		return nil, err
+	}
+
+	return room, nil
+
+}
+
+func UpdateRoomWinner(RoomId int64, Winner int64) (*dto.Room, error) {
+	_, err := DB.Exec("UPDATE rooms SET winner=? WHERE id=?", Winner, RoomId)
 	if err != nil {
 		return nil, err
 	}

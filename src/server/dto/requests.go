@@ -15,10 +15,10 @@ type UpdateUserRequest struct {
 
 type CreateRoomRequest struct {
 	User1 string `json:"user1"`
-	User2 string `json:"user2"`
 }
 
 type UpdateRoomRequest struct {
+	User2  string `json:"user2"`
 	Winner string `json:"winner"`
 }
 
