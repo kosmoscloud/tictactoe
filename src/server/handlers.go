@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	db "tictactoe-service/database"
+	dberr "tictactoe-service/database/errors"
 	"tictactoe-service/server/dto"
 
 	"github.com/gorilla/mux"
@@ -57,6 +58,11 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.CreateUser(body.Username)
 	if err != nil {
+		if _, ok := err.(*dberr.UserAlreadyExistsError); ok {
+			json.NewEncoder(w).Encode(err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 		log.Default().Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
