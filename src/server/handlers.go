@@ -8,8 +8,9 @@ import (
 	"strconv"
 	db "tictactoe-service/database"
 	dberr "tictactoe-service/database/errors"
+	dbvalidators "tictactoe-service/database/validators"
 	"tictactoe-service/game/errors"
-	validators "tictactoe-service/game/validators"
+	gamevalidators "tictactoe-service/game/validators"
 	"tictactoe-service/server/dto"
 
 	"github.com/gorilla/mux"
@@ -40,7 +41,6 @@ func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(user)
-
 }
 
 func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -72,7 +72,6 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(user)
-
 }
 
 func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -81,6 +80,11 @@ func HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	log.Default().Println("Handling update user with id: " + sid)
 
 	id, err := strconv.ParseInt(sid, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	jsonBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Default().Println(err)
@@ -201,6 +205,7 @@ func HandleDeleteRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
 func HandleGetRoom(w http.ResponseWriter, r *http.Request) {
 	pathParams := mux.Vars(r)
 	sid := pathParams["id"]
@@ -222,7 +227,6 @@ func HandleGetRoom(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(room)
-
 }
 
 func HandleUpdateRoomUser2(w http.ResponseWriter, r *http.Request) {
@@ -231,6 +235,11 @@ func HandleUpdateRoomUser2(w http.ResponseWriter, r *http.Request) {
 	log.Default().Println("Handling update room with id: " + sid)
 
 	id, err := strconv.ParseInt(sid, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	jsonBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Default().Println(err)
@@ -277,6 +286,11 @@ func HandleUpdateRoomWinner(w http.ResponseWriter, r *http.Request) {
 	log.Default().Println("Handling update room with id: " + sid)
 
 	id, err := strconv.ParseInt(sid, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	jsonBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Default().Println(err)
@@ -308,7 +322,6 @@ func HandleUpdateRoomWinner(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func HandleUpdateRoomAddMove(w http.ResponseWriter, r *http.Request) {
@@ -334,9 +347,14 @@ func HandleUpdateRoomAddMove(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(jsonBody, body)
 
 	givenMove := &dto.Move{UserId: body.UserId, Row: body.Row, Col: body.Col}
-	if !validators.IsMoveValid(id, givenMove) {
+	if !dbvalidators.IsMoveValid(id, givenMove) {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode((&errors.MoveAlreadyExists{AlreadyExistingMove: givenMove}).Error())
+		json.NewEncoder(w).Encode((&errors.InvalidMoveValue{InvalidMove: givenMove}).Error())
+		return
+	}
+	if ok, err := gamevalidators.IsMoveLegal(id, givenMove); !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 
@@ -348,6 +366,15 @@ func HandleUpdateRoomAddMove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if gamevalidators.IsMoveWinning(id, givenMove) {
+		_, err := db.UpdateRoomWinner(id, givenMove.UserId)
+		if err != nil {
+			log.Default().Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(returnedMove)
 	if err != nil {
@@ -355,5 +382,4 @@ func HandleUpdateRoomAddMove(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 }
