@@ -3,7 +3,7 @@ package validators
 import (
 	"log"
 	db "tictactoe-service/database"
-	"tictactoe-service/game/errors"
+	gameerr "tictactoe-service/game/errors"
 	"tictactoe-service/server/dto"
 )
 
@@ -11,17 +11,17 @@ func IsMoveLegal(roomId int64, givenMove *dto.Move) (bool, error) {
 	moves, err := db.GetMoves(roomId)
 	if err != nil {
 		log.Default().Println(err)
-		return false, &(errors.InvalidMoveValue{InvalidMove: givenMove})
+		return false, &(gameerr.InvalidMoveValue{InvalidMove: givenMove})
 	}
 
 	for _, move := range moves {
 		if move.Row == givenMove.Row && move.Col == givenMove.Col {
-			return false, &(errors.MoveAlreadyExists{AlreadyExistingMove: move})
+			return false, &(gameerr.MoveAlreadyExists{AlreadyExistingMove: move})
 		}
 	}
 
 	if moves[len(moves)-1].UserId == givenMove.UserId {
-		return false, &(errors.UserJustMoved{UserId: givenMove.UserId})
+		return false, &(gameerr.UserJustMoved{UserId: givenMove.UserId})
 	}
 
 	return true, nil
