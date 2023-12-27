@@ -18,7 +18,9 @@ func InitDB() {
 		log.Default().Print("Successfully connected to tictactoe-database!")
 	}
 
-	setupUserTable(DB)
+	SetupUserTable()
+	SetupRoomTable()
+	SetupMoveTable()
 }
 
 func CloseDB() {

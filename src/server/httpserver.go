@@ -18,6 +18,20 @@ func InitServer() {
 
 	http.Handle("/api/user", CuserRouter)
 	http.Handle("/api/user/", RUDuserRouter)
+
+	CroomRouter := mux.NewRouter().PathPrefix("/api/room").Subrouter()
+	CroomRouter.HandleFunc("", HandleCreateRoom).Methods("POST")
+
+	RUDroomRouter := mux.NewRouter().PathPrefix("/api/room").Subrouter()
+	RUDroomRouter.HandleFunc("/{id}", HandleGetRoom).Methods("GET")
+	RUDroomRouter.HandleFunc("/{id}/user", HandleUpdateRoomUser2).Methods("PUT")
+	RUDroomRouter.HandleFunc("/{id}/move", HandleUpdateRoomMoves).Methods("PUT")
+	RUDroomRouter.HandleFunc("/{id}/winner", HandleUpdateRoomWinner).Methods("PUT")
+	RUDroomRouter.HandleFunc("/{id}", HandleDeleteRoom).Methods("DELETE")
+
+	http.Handle("/api/room", CroomRouter)
+	http.Handle("/api/room/", RUDroomRouter)
+
 }
 
 func Serve() {

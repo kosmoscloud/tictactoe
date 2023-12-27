@@ -3,8 +3,9 @@ package dto
 import "time"
 
 type Move struct {
-	Row int32 `json:"row"`
-	Col int32 `json:"col"`
+	Userid int64 `json:"userid"`
+	Row    int32 `json:"row"`
+	Col    int32 `json:"col"`
 }
 
 type Room struct {
@@ -13,7 +14,7 @@ type Room struct {
 	User1       string    `json:"user1"`
 	User2       string    `json:"user2"`
 	Winner      string    `json:"winner"`
-	Moves       []Move    `json:"moves"`
+	Moves       []*Move   `json:"moves"`
 }
 
 type User struct {

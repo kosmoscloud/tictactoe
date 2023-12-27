@@ -41,6 +41,7 @@ func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
+	log.Default().Println("Handling create user...")
 	jsonBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Default().Println(err)
@@ -129,4 +130,203 @@ func HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func HandleCreateRoom(w http.ResponseWriter, r *http.Request) {
+	jsonBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	body := &dto.CreateRoomRequest{}
+	json.Unmarshal(jsonBody, body)
+	if body.User1 == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Default().Println(err)
+		return
+	}
+
+	usrid1, err := strconv.ParseInt(body.User1, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	room, err := db.CreateRoom(usrid1)
+	if err != nil {
+		log.Default().Println(err)
+		log.Default().Println("Błąd w tworzeniu pokoju ")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(room)
+}
+
+func HandleDeleteRoom(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	id := pathParams["id"]
+	log.Default().Println("Handling delete room with id: " + id)
+
+	roomId, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	room, err := db.DeleteRoom(roomId)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(room)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+func HandleGetRoom(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	sid := pathParams["id"]
+	log.Default().Println("Handling get room with id: " + sid)
+
+	id, err := strconv.ParseInt(sid, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	room, err := db.GetRoom(id)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(room)
+
+}
+
+func HandleUpdateRoomUser2(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	sid := pathParams["id"]
+	log.Default().Println("Handling update room with id: " + sid)
+
+	id, err := strconv.ParseInt(sid, 10, 64)
+	jsonBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	body := &dto.UpdateRoomRequest{}
+	json.Unmarshal(jsonBody, body)
+
+	user2Id, err := strconv.ParseInt(body.User2, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	room, err := db.UpdateRoomUser2(id, user2Id)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(room)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func HandleUpdateRoomWinner(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	sid := pathParams["id"]
+	log.Default().Println("Handling update room with id: " + sid)
+
+	id, err := strconv.ParseInt(sid, 10, 64)
+	jsonBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	body := &dto.UpdateRoomRequest{}
+	json.Unmarshal(jsonBody, body)
+
+	winnerId, err := strconv.ParseInt(body.Winner, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	room, err := db.UpdateRoomWinner(id, winnerId)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(room)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+}
+
+func HandleUpdateRoomMoves(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	sid := pathParams["id"]
+	log.Default().Println("Handling update room with id: " + sid)
+
+	id, err := strconv.ParseInt(sid, 10, 64)
+	jsonBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	body := &dto.UpdateRoomRequestMove{}
+	json.Unmarshal(jsonBody, body)
+	log.Default().Println(body.UserId, body.Row, body.Col) //do usunięcia
+
+	move, err := db.CreateMove(id, body.UserId, body.Row, body.Col)
+
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(move)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 }
