@@ -22,3 +22,7 @@ type User struct {
 	Username    string    `json:"username"`
 	CreatedDate time.Time `json:"createdDate"`
 }
+
+func (u *User) String() string {
+	return u.Username + ", with id: " + u.UserId
+}
