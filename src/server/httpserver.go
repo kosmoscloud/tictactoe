@@ -26,7 +26,6 @@ func InitServer() {
 	RUDroomRouter.HandleFunc("/{id}", HandleGetRoom).Methods("GET")
 	RUDroomRouter.HandleFunc("/{id}/user", HandleUpdateRoomUser2).Methods("PUT")
 	RUDroomRouter.HandleFunc("/{id}/move", HandleUpdateRoomAddMove).Methods("PUT")
-	RUDroomRouter.HandleFunc("/{id}/winner", HandleUpdateRoomWinner).Methods("PUT")
 	RUDroomRouter.HandleFunc("/{id}", HandleDeleteRoom).Methods("DELETE")
 
 	http.Handle("/api/room", CroomRouter)
