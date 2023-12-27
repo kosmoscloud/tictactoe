@@ -4,50 +4,52 @@ import (
 	"tictactoe-service/server/dto"
 )
 
-func createdMove(roomId int64, userId int64, row int64, col int64) (*dto.Move, *dto.Room, error) {
-	rows, err := DB.Exec("INSERT INTO moves (room_id, user_id, row_, col) VALUES (?, ?, ?, ?)", roomId, userId, row, col)
+func CreateMove(roomId int64, userId int64, row int32, col int32) (*dto.Move, error) {
+	rows, err := DB.Exec("INSERT INTO moves (room_id, user_id, row_, col_) VALUES (?, ?, ?, ?)", roomId, userId, row, col)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	id, err := rows.LastInsertId()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	move, room, err := GetMove(id)
+	move, err := GetMove(id)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return move, room, nil
+	return move, nil
 
 }
 
-func GetMove(id int64) (*dto.Move, *dto.Room, error) {
+func GetMove(id int64) (*dto.Move, error) {
+
+	row := DB.QueryRow("SELECT id, room_id, user_id, row_, col_ FROM moves WHERE id=?", id)
 	move := &dto.Move{}
-	room := &dto.Room{}
-	row := DB.QueryRow("SELECT id, room_id, user_id, row_, col FROM moves WHERE id=?", id)
-	err := row.Scan(&room.RoomId, &room.User1, &move.Row, &move.Col)
+	var idmove, room_id int64
+	err := row.Scan(&idmove, &room_id, &move.Userid, &move.Row, &move.Col)
+
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return move, room, nil
+
+	return move, nil
 }
 
-func GetMoves(roomId int64) ([]*dto.Move, *dto.Room, error) {
+func GetMoves(roomId int64) ([]*dto.Move, error) {
 	moves := []*dto.Move{}
-	room := &dto.Room{}
-	rows, err := DB.Query("SELECT id, room_id, user_id, row_, col FROM moves WHERE room_id=?", roomId)
+	rows, err := DB.Query("SELECT user_id, row_, col_ FROM moves WHERE room_id=?", roomId)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	for rows.Next() {
 		move := &dto.Move{}
-		err := rows.Scan(&move.Row, &move.Col)
+		err := rows.Scan(&move.Userid, &move.Row, &move.Col)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		moves = append(moves, move)
 	}
-	return moves, room, nil
+	return moves, nil
 }

@@ -25,3 +25,9 @@ type UpdateRoomRequest struct {
 type DeleteRoomRequest struct {
 	RoomId int64 `json:"id"`
 }
+
+type UpdateRoomRequestMove struct {
+	UserId int64 `json:"userid"`
+	Row    int32 `json:"row"`
+	Col    int32 `json:"col"`
+}

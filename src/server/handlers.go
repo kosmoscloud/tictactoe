@@ -41,6 +41,7 @@ func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
+	log.Default().Println("Handling create user...")
 	jsonBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Default().Println(err)
@@ -287,6 +288,41 @@ func HandleUpdateRoomWinner(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(room)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+}
+
+func HandleUpdateRoomMoves(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	sid := pathParams["id"]
+	log.Default().Println("Handling update room with id: " + sid)
+
+	id, err := strconv.ParseInt(sid, 10, 64)
+	jsonBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	body := &dto.UpdateRoomRequestMove{}
+	json.Unmarshal(jsonBody, body)
+	log.Default().Println(body.UserId, body.Row, body.Col) //do usunięcia
+
+	move, err := db.CreateMove(id, body.UserId, body.Row, body.Col)
+
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(move)
 	if err != nil {
 		log.Default().Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
