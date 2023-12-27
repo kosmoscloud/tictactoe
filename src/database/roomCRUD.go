@@ -9,6 +9,9 @@ func GetRoom(id int64) (*dto.Room, error) {
 	room := &dto.Room{}
 	row := DB.QueryRow("SELECT id, created, user1, user2, winner FROM rooms WHERE id=?", id)
 	err := row.Scan(&room.RoomId, &room.CreatedDate, &room.User1, &room.User2, &room.Winner)
+	if err != nil {
+		return nil, err
+	}
 	moves, err := GetMoves(id)
 	if err != nil {
 		return nil, err

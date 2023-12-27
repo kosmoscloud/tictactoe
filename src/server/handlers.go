@@ -8,6 +8,8 @@ import (
 	"strconv"
 	db "tictactoe-service/database"
 	dberr "tictactoe-service/database/errors"
+	"tictactoe-service/game/errors"
+	validators "tictactoe-service/game/validators"
 	"tictactoe-service/server/dto"
 
 	"github.com/gorilla/mux"
@@ -302,12 +304,18 @@ func HandleUpdateRoomWinner(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func HandleUpdateRoomMoves(w http.ResponseWriter, r *http.Request) {
+func HandleUpdateRoomAddMove(w http.ResponseWriter, r *http.Request) {
 	pathParams := mux.Vars(r)
 	sid := pathParams["id"]
 	log.Default().Println("Handling update room with id: " + sid)
 
 	id, err := strconv.ParseInt(sid, 10, 64)
+	if err != nil {
+		log.Default().Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	jsonBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Default().Println(err)
@@ -317,9 +325,15 @@ func HandleUpdateRoomMoves(w http.ResponseWriter, r *http.Request) {
 
 	body := &dto.UpdateRoomRequestMove{}
 	json.Unmarshal(jsonBody, body)
-	log.Default().Println(body.UserId, body.Row, body.Col) //do usunięcia
 
-	move, err := db.CreateMove(id, body.UserId, body.Row, body.Col)
+	givenMove := &dto.Move{UserId: body.UserId, Row: body.Row, Col: body.Col}
+	if !validators.IsMoveValid(id, givenMove) {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode((&errors.MoveAlreadyExists{AlreadyExistingMove: givenMove}).Error())
+		return
+	}
+
+	returnedMove, err := db.CreateMove(id, givenMove)
 
 	if err != nil {
 		log.Default().Println(err)
@@ -328,7 +342,7 @@ func HandleUpdateRoomMoves(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(move)
+	err = json.NewEncoder(w).Encode(returnedMove)
 	if err != nil {
 		log.Default().Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
