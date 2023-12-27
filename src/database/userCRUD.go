@@ -1,6 +1,7 @@
 package database
 
 import (
+	dtoerr "tictactoe-service/database/errors"
 	"tictactoe-service/server/dto"
 	"time"
 
@@ -18,22 +19,26 @@ func GetUser(id int64) (*dto.User, error) {
 }
 
 func CreateUser(username string) (*dto.User, error) {
-	createdDate := time.Now()
-	rows, err := DB.Exec("INSERT INTO users (username, created) VALUES (?, ?)", username, createdDate)
-	if err != nil {
-		return nil, err
-	}
-	id, err := rows.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
 
-	user, err := GetUser(id)
-	if err != nil {
-		return nil, err
-	}
+	if !DoesUserExist(username) {
+		createdDate := time.Now()
+		rows, err := DB.Exec("INSERT INTO users (username, created) VALUES (?, ?)", username, createdDate)
+		if err != nil {
+			return nil, err
+		}
+		id, err := rows.LastInsertId()
+		if err != nil {
+			return nil, err
+		}
 
-	return user, nil
+		user, err := GetUser(id)
+		if err != nil {
+			return nil, err
+		}
+		return user, nil
+	} else {
+		return nil, &dtoerr.UserAlreadyExistsError{AlreadyExistingUserUsername: username}
+	}
 }
 
 func UpdateUser(id int64, username string) (*dto.User, error) {
@@ -62,4 +67,15 @@ func DeleteUser(id int64) (*dto.User, error) {
 	}
 
 	return user, nil
+
+}
+
+func DoesUserExist(username string) bool {
+	user := &dto.User{}
+	row := DB.QueryRow("SELECT * FROM users WHERE username=?", username)
+	err := row.Scan(&user.UserId, &user.Username, &user.CreatedDate)
+	if err != nil {
+		return false
+	}
+	return true
 }
