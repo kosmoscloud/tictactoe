@@ -54,6 +54,7 @@ func UpdateRoomUser2(RoomId int64, User2 int64) (*dto.Room, error) {
 }
 
 func UpdateRoomWinner(RoomId int64, Winner int64) (*dto.Room, error) {
+
 	_, err := DB.Exec("UPDATE rooms SET winner=? WHERE id=?", Winner, RoomId)
 	if err != nil {
 		return nil, err

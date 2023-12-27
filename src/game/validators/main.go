@@ -2,6 +2,7 @@ package validators
 
 import (
 	"log"
+	"strconv"
 	db "tictactoe-service/database"
 	"tictactoe-service/server/dto"
 )
@@ -20,4 +21,18 @@ func IsMoveValid(roomId int64, givenMove *dto.Move) bool {
 	}
 
 	return true
+}
+
+func IsUserAlreadyInRoom(roomId int64, userId int64) bool {
+	room, err := db.GetRoom(roomId)
+	if err != nil {
+		log.Default().Println(err)
+		return false
+	}
+	suserId := strconv.FormatInt(userId, 10)
+	if room.User1 == suserId {
+		return true
+	}
+
+	return false
 }

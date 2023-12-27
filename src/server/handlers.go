@@ -248,6 +248,13 @@ func HandleUpdateRoomUser2(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if validators.IsUserAlreadyInRoom(id, user2Id) {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode((&errors.UserAlreadyExistsInRoom{}).Error())
+		return
+
+	}
+
 	room, err := db.UpdateRoomUser2(id, user2Id)
 	if err != nil {
 		log.Default().Println(err)
