@@ -1,9 +1,12 @@
 package dto
 
-import "time"
+import (
+	"strconv"
+	"time"
+)
 
 type Move struct {
-	Userid int64 `json:"userid"`
+	UserId int64 `json:"userid"`
 	Row    int32 `json:"row"`
 	Col    int32 `json:"col"`
 }
@@ -21,4 +24,10 @@ type User struct {
 	UserId      string    `json:"id"`
 	Username    string    `json:"username"`
 	CreatedDate time.Time `json:"createdDate"`
+}
+
+func (m *Move) String() string {
+	return "row: " + strconv.Itoa(int(m.Row)) +
+		", col: " + strconv.Itoa(int(m.Col)) +
+		", made by user with id " + strconv.Itoa(int(m.UserId))
 }
